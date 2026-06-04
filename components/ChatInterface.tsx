@@ -4,17 +4,12 @@ import React, { useState, useEffect, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { UI_CONTENT, INTENT_OPTIONS } from '../lib/content';
 
 interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
 }
-
-const INTENT_OPTIONS = [
-  { label: '📊 Generate a Career Report', message: 'I want to generate a career report.' },
-  { label: '🤝 Find me a Mentor',         message: 'I want to find a mentor.'           },
-  { label: '💬 Ask a Question',           message: 'I just want to ask some questions.' },
-];
 
 const MD_COMPONENTS: React.ComponentProps<typeof ReactMarkdown>['components'] = {
   a: (props) => (
@@ -30,7 +25,7 @@ const MD_COMPONENTS: React.ComponentProps<typeof ReactMarkdown>['components'] = 
 export default function ChatInterface() {
   const [threadId] = useState<string>(() => uuidv4());
   const [messages,       setMessages]       = useState<ChatMessage[]>([
-    { role: 'assistant', content: 'Welcome! Please attach your resume to begin.' },
+    { role: 'assistant', content: UI_CONTENT.welcomeMessage },
   ]);
   const [input,          setInput]          = useState<string>('');
   const [loading,        setLoading]        = useState<boolean>(false);
@@ -50,7 +45,7 @@ export default function ChatInterface() {
     if (!file) return;
     e.target.value = '';
 
-    setMessages(prev => [...prev, { role: 'user', content: '📎 Resume uploaded' }]);
+    setMessages(prev => [...prev, { role: 'user', content: UI_CONTENT.uploadIndicator }]);
     setLoading(true);
 
     const formData = new FormData();
@@ -63,13 +58,13 @@ export default function ChatInterface() {
       const data = await res.json();
       setMessages(prev => [
         ...prev,
-        { role: 'assistant', content: data.response || data.error || 'No response received.' },
+        { role: 'assistant', content: data.response || UI_CONTENT.errors.noResponse },
       ]);
       setResumeUploaded(true);
     } catch {
       setMessages(prev => [
         ...prev,
-        { role: 'assistant', content: 'Error: Could not connect to backend.' },
+        { role: 'assistant', content: UI_CONTENT.errors.backendUnreachable },
       ]);
     } finally {
       setLoading(false);
@@ -94,12 +89,12 @@ export default function ChatInterface() {
       const data = await res.json();
       setMessages(prev => [
         ...prev,
-        { role: 'assistant', content: data.response || data.error || 'No response received.' },
+        { role: 'assistant', content: data.response || UI_CONTENT.errors.noResponse },
       ]);
     } catch {
       setMessages(prev => [
         ...prev,
-        { role: 'assistant', content: 'Error: Could not connect to backend.' },
+        { role: 'assistant', content: UI_CONTENT.errors.backendUnreachable },
       ]);
     } finally {
       setLoading(false);
@@ -147,7 +142,7 @@ export default function ChatInterface() {
           {resumeUploaded && !intentSelected && !loading && (
             <div className="pt-2">
               <p className="text-sm font-semibold text-gray-700 mb-3">
-                What would you like to do next?
+                {UI_CONTENT.intentPrompt}
               </p>
               <div className="flex flex-wrap gap-3">
                 {INTENT_OPTIONS.map(({ label, message }) => (
@@ -173,7 +168,7 @@ export default function ChatInterface() {
           <button
             onClick={() => fileInputRef.current?.click()}
             disabled={loading || resumeUploaded}
-            title={resumeUploaded ? 'Resume already uploaded' : 'Attach resume (PDF or DOCX)'}
+            title={resumeUploaded ? UI_CONTENT.tooltips.resumeAlreadyUploaded : UI_CONTENT.tooltips.attachResume}
             className="flex-shrink-0 p-1.5 text-gray-400 hover:text-gray-700 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
@@ -191,7 +186,7 @@ export default function ChatInterface() {
                 sendMessage(input);
               }
             }}
-            placeholder="Ask about your career..."
+            placeholder={UI_CONTENT.inputPlaceholder}
             rows={1}
             className="flex-1 bg-transparent border-none outline-none text-sm resize-none leading-relaxed py-0.5"
           />
@@ -205,7 +200,7 @@ export default function ChatInterface() {
           </button>
         </div>
         <p className="text-center text-xs text-gray-400 mt-2">
-          This is AI-generated content based on publicly available information. It is not legal advice. Always consult a qualified immigration professional before making decisions.
+          {UI_CONTENT.disclaimer}
         </p>
       </div>
     </div>
