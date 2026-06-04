@@ -1,24 +1,33 @@
-// Server-side API proxy route for backend communication
-import { NextResponse } from 'next/server';
+// app/api/chat/route.ts
+import { NextRequest, NextResponse } from 'next/server';
 
-export async function POST(request: Request) {
+export async function POST(req: NextRequest) {
+  const backendUrl = process.env.BACKEND_URL || 'http://localhost:8000/chat';
+
   try {
-    const incomingData = await request.formData();
-    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/chat';
+    const formData = await req.formData();
 
-    const upstreamResponse = await fetch(backendUrl, {
+    const response = await fetch(backendUrl, {
       method: 'POST',
-      body: incomingData,
+      body: formData,
     });
 
-    if (!upstreamResponse.ok) {
-      const errorPayload = await upstreamResponse.text();
-      return new NextResponse(errorPayload, { status: upstreamResponse.status });
+    if (!response.ok) {
+      const errorText = await response.text();
+      return NextResponse.json(
+        { response: `Backend Error ${response.status}: ${errorText}` },
+        { status: response.status }
+      );
     }
 
-    const payload = await upstreamResponse.json();
-    return NextResponse.json(payload);
-  } catch (err: any) {
-    return new NextResponse(err.message, { status: 500 });
+    const data = await response.json();
+    return NextResponse.json(data);
+
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'unknown error';
+    return NextResponse.json(
+      { response: `Connection Error: Could not reach backend. Details: ${message}` },
+      { status: 502 }
+    );
   }
 }
