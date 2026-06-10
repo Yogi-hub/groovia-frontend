@@ -1,26 +1,113 @@
 @import "tailwindcss";
 
+/* ============================================================================
+ * Immigroov design tokens — navy + warm orange, slate neutrals
+ * ============================================================================ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Brand — navy (deep, trustworthy) */
+  --brand-50:  #EFF4FB;
+  --brand-100: #DBE6F5;
+  --brand-200: #B7CCE9;
+  --brand-300: #93B2DC;
+  --brand-400: #5B85C7;
+  --brand-500: #1D4ED8;
+  --brand-600: #1E40AF;
+  --brand-700: #1E3A8A;
+  --brand-800: #14296B;
+  --brand-900: #0F2C6B;
+
+  /* Accent — warm orange (energy, CTA) */
+  --accent-50:  #FFF7ED;
+  --accent-100: #FFEDD5;
+  --accent-200: #FED7AA;
+  --accent-300: #FDBA74;
+  --accent-400: #FB923C;
+  --accent-500: #F59E0B;
+  --accent-600: #D97706;
+  --accent-700: #B45309;
+
+  /* Surfaces */
+  --background: #FAFBFD;
+  --foreground: #0F172A;
+  --muted:      #64748B;
+  --border:     #E2E8F0;
+  --card:       #FFFFFF;
 }
 
+/* Map to Tailwind's CSS-vars-driven theme (Tailwind v4 style) */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-muted:      var(--muted);
+  --color-border:     var(--border);
+  --color-card:       var(--card);
+
+  --color-brand-50:  var(--brand-50);
+  --color-brand-100: var(--brand-100);
+  --color-brand-200: var(--brand-200);
+  --color-brand-300: var(--brand-300);
+  --color-brand-400: var(--brand-400);
+  --color-brand-500: var(--brand-500);
+  --color-brand-600: var(--brand-600);
+  --color-brand-700: var(--brand-700);
+  --color-brand-800: var(--brand-800);
+  --color-brand-900: var(--brand-900);
+
+  --color-accent-50:  var(--accent-50);
+  --color-accent-100: var(--accent-100);
+  --color-accent-200: var(--accent-200);
+  --color-accent-300: var(--accent-300);
+  --color-accent-400: var(--accent-400);
+  --color-accent-500: var(--accent-500);
+  --color-accent-600: var(--accent-600);
+  --color-accent-700: var(--accent-700);
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html, body {
+  height: 100%;
 }
 
 body {
   background: var(--background);
+  /* Soft layered gradient — adds depth without visible lines. */
+  background-image:
+    radial-gradient(ellipse 1200px 800px at 0% 0%, rgba(29, 78, 216, 0.04), transparent 60%),
+    radial-gradient(ellipse 1000px 700px at 100% 100%, rgba(245, 158, 11, 0.035), transparent 60%);
+  background-attachment: fixed;
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Smooth hover transitions everywhere */
+* {
+  transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+/* Subtle entrance animation utility */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-up { animation: fade-up 0.4s cubic-bezier(0.4, 0, 0.2, 1) both; }
+
+/* Pretty focus rings — brand navy */
+*:focus-visible {
+  outline: 2px solid var(--brand-500);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Hero gradient — subtle navy → orange wash for landing */
+.hero-gradient {
+  background:
+    radial-gradient(1200px 600px at 20% 0%, rgba(29, 78, 216, 0.08), transparent 60%),
+    radial-gradient(900px 500px at 100% 30%, rgba(245, 158, 11, 0.08), transparent 60%),
+    var(--background);
 }
