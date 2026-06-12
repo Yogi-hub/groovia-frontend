@@ -11,6 +11,7 @@ function flag(name: string, defaultOn = true): boolean {
 
 export const FEATURES = {
   chatHistory:           flag('CHAT_HISTORY',   false),  // recent-chats sidebar; off by default
+  chatPersist:           flag('CHAT_PERSIST'),            // auto-resume last thread on sign-in; on by default
   guestMode:             flag('GUEST_MODE'),
   mentorsPublic:         flag('MENTORS_PUBLIC'),
   resumeUpload:          flag('RESUME_UPLOAD'),

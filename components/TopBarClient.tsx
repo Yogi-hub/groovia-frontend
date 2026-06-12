@@ -48,7 +48,7 @@ export function TopBarClient({ email }: { email: string | null }) {
               size="sm"
               onClick={handleSignOut}
               loading={signingOut}
-              className="shadow-[0_4px_18px_-6px_rgba(15,23,42,0.18)] bg-card/90 backdrop-blur-md"
+              className="bg-transparent shadow-none hover:bg-card/60"
             >
               <LogOut className="h-4 w-4" />
               <span className="hidden sm:inline">Sign out</span>

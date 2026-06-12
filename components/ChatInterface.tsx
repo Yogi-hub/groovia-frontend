@@ -144,7 +144,6 @@ export default function ChatInterface({ authed }: Props) {
   }, [authed]);
   /* eslint-enable react-hooks/set-state-in-effect */
 
-  // Persist on every change, but only AFTER first hydration so we don't overwrite
   // localStorage with the initial defaults.
   useEffect(() => {
     if (!hydrated) return;
@@ -177,13 +176,50 @@ export default function ChatInterface({ authed }: Props) {
     })();
   }, [hydrated, authed, threadId]);
 
+  // Auto-resume the user's most recent thread on sign-in.
+  // Triggers only when (1) the feature flag is on, (2) the user is authed, (3) the local
+  // chat is empty (just the welcome message + no resume uploaded), so we never clobber
+  // an in-progress conversation. Premium-tier gating can later wrap this in a paid check.
+  useEffect(() => {
+    if (!hydrated || !authed || !FEATURES.chatPersist) return;
+    if (resumeUploaded || messages.length > 1) return;
+    (async () => {
+      const headers = await authHeaders();
+      if (!Object.keys(headers).length) return;
+      const tRes = await fetch('/api/chat/threads?limit=1', { headers, cache: 'no-store' }).catch(() => null);
+      if (!tRes?.ok) return;
+      const tData = await tRes.json();
+      const last = tData.threads?.[0];
+      if (!last?.id || last.id === threadId) return;
+
+      const mRes = await fetch(`/api/chat/threads/${last.id}/messages`, { headers, cache: 'no-store' }).catch(() => null);
+      if (!mRes?.ok) return;
+      const mData = await mRes.json();
+      const restored: ChatMessage[] = (mData.messages || []).filter(
+        (m: { role: string; content: string }) => m.role === 'user' || m.role === 'assistant',
+      );
+      if (!restored.length) return;
+
+      setThreadId(last.id);
+      setMessages(restored);
+      // Their prior conversation already covered the upload + intent gates.
+      setResumeUploaded(true);
+      setIntentSelected(true);
+      window.localStorage.setItem(LS_KEYS.threadId, JSON.stringify(last.id));
+    })();
+  }, [hydrated, authed, resumeUploaded, messages.length, threadId]);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const chatStartRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
+    // While the entry hero is showing, stay at the top — auto-scrolling would
+    // jump straight past it to the composer.
+    if (!resumeUploaded && messages.length <= 1) return;
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, loading]);
+  }, [messages, loading, resumeUploaded]);
 
   // Auto-resize textarea
   useEffect(() => {
@@ -278,10 +314,13 @@ export default function ChatInterface({ authed }: Props) {
 
       {/* Intro + Messages */}
       <div className="flex-1 overflow-y-auto">
-        {/* Static intro banner — only shown when the conversation hasn't really started */}
-        {!resumeUploaded && messages.length <= 1 && <ChatIntro />}
+        {/* Full-height hero — only shown when the conversation hasn't really started.
+            The CTA scrolls down into the chat area below. */}
+        {!resumeUploaded && messages.length <= 1 && (
+          <ChatIntro onStart={() => chatStartRef.current?.scrollIntoView({ behavior: 'smooth' })} />
+        )}
 
-        <div className="mx-auto max-w-3xl px-4 pt-8 pb-44 space-y-6">
+        <div ref={chatStartRef} className="mx-auto max-w-3xl px-4 pt-8 pb-44 space-y-6">
           {messages.map((m, i) => (
             <div
               key={i}
@@ -297,7 +336,7 @@ export default function ChatInterface({ authed }: Props) {
                   'max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed',
                   m.role === 'user'
                     ? 'bg-brand-900 text-white rounded-br-sm'
-                    : 'bg-brand-50/60 text-foreground rounded-bl-sm',
+                    : 'bg-brand-50/60 text-foreground rounded-bl-sm prose-chat',
                 )}
               >
                 <ReactMarkdown remarkPlugins={[remarkGfm]} components={MD_COMPONENTS}>
@@ -308,15 +347,15 @@ export default function ChatInterface({ authed }: Props) {
           ))}
 
           {loading && (
-            <div className="flex gap-3">
-              <div className="h-7 w-7 shrink-0 rounded-full bg-gradient-to-br from-brand-700 to-accent-500 flex items-center justify-center text-white">
-                <Sparkles className="h-3.5 w-3.5" />
-              </div>
-              <div className="flex items-center gap-1.5 px-4 py-3 rounded-2xl bg-brand-50/60">
-                <span className="w-1.5 h-1.5 bg-accent-500 rounded-full animate-bounce [animation-delay:0ms]" />
-                <span className="w-1.5 h-1.5 bg-accent-500 rounded-full animate-bounce [animation-delay:150ms]" />
-                <span className="w-1.5 h-1.5 bg-accent-500 rounded-full animate-bounce [animation-delay:300ms]" />
-              </div>
+            /* Centered thinking indicator — no bubble/backdrop. mix-blend-multiply
+               drops the GIF's white background onto the light page. */
+            <div className="fixed inset-0 z-40 flex items-center justify-center pointer-events-none bg-background/10 backdrop-blur-sm">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/groovia-loop.gif"
+                alt="Groovia is thinking…"
+                className="h-24 w-auto mix-blend-multiply select-none"
+              />
             </div>
           )}
 

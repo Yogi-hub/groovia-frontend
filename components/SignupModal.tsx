@@ -1,7 +1,8 @@
 'use client';
 import { useEffect } from 'react';
 import Link from 'next/link';
-import { Sparkles, Lock } from 'lucide-react';
+import Image from 'next/image';
+import { Lock } from 'lucide-react';
 import { Button } from './ui/Button';
 import { UI_CONTENT } from '../lib/content';
 
@@ -24,9 +25,14 @@ export function SignupModal({ open }: Props) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-brand-900/40 backdrop-blur-sm animate-fade-up">
       <div className="relative w-full max-w-md bg-card rounded-2xl shadow-2xl p-6 sm:p-7">
-        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-brand-700 to-accent-500 flex items-center justify-center text-white mb-4">
-          <Sparkles className="h-5 w-5" />
-        </div>
+        <Image
+          src="/Immigroov_Transparent_Logo.png"
+          alt="Immigroov"
+          width={280}
+          height={60}
+          className="object-contain mb-5"
+          style={{ height: '26px', width: 'auto' }}
+        />
 
         <h2 className="text-xl font-semibold tracking-tight text-brand-900">{t.title}</h2>
         <p className="mt-2 text-sm text-foreground/70 leading-relaxed">{t.subtitle}</p>

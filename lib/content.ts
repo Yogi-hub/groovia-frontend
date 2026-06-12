@@ -15,14 +15,19 @@ export const UI_CONTENT = {
     attachResume: 'Attach resume (PDF or DOCX)',
     resumeAlreadyUploaded: 'Resume already uploaded',
   },
-  chatIntro: {
+  hero: {
     title: "Hi, I'm Groovia.",
-    description:
-      "I help people find the right destination, connect with mentors who have lived the journey or legal advice. Attach your resume and we'll get started.",
+    tagline: 'The AI assistant of Immigroov.',
+    intro:
+      "Tell me where you want to go — I'll plan the route and connect you with people who've already made the move.",
+    movement:
+      "Immigroov isn't just a platform — it's a movement. A global community of people helping people move smarter, together.",
     features: [
       'Discover 3–5 countries that fit your skills and budget.',
-      "Book meeting with real mentors who've already made themove.",
+      "Book meetings with real mentors who've already made the move.",
+      'Get instant real-time answers on visas, jobs, housing and daily life.',
     ],
+    scrollCta: 'Scroll down to start your journey',
   },
   sidebar: {
     newChat: 'New chat',
