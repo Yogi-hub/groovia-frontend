@@ -1,7 +1,7 @@
 import { createClient } from '../../../lib/supabase/server';
 import { backendBaseUrl } from '../../../lib/backend';
-import { Card, CardBody } from '../../../components/ui/Card';
 import { ConnectCalendar } from '../../../components/ConnectCalendar';
+import { MentorSignupForm } from '../../../components/MentorSignupForm';
 
 export const metadata = { title: 'Join as Mentor — Immigroov' };
 
@@ -40,13 +40,7 @@ export default async function MentorPage() {
             connectedAt={mentor.calendar_connected_at}
           />
         ) : (
-          <Card>
-            <CardBody className="pt-6">
-              <p className="text-sm text-muted">
-                This account isn&apos;t linked to a mentor profile yet.
-              </p>
-            </CardBody>
-          </Card>
+          <MentorSignupForm />
         )}
       </div>
     </div>
