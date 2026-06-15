@@ -1,7 +1,5 @@
 'use client';
-// Full-height entry hero for /chat. Typewriter headline, glass feature cards on
-// an animated gradient-blob + blueprint-grid backdrop, and a scroll CTA that
-// drops the user into the chat below. Ambience is scoped to this section only.
+// Full-height entry hero for /chat: typewriter headline, feature cards, scroll CTA.
 import { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import { ChevronDown, Compass, Users, Zap } from 'lucide-react';
@@ -9,8 +7,7 @@ import { UI_CONTENT } from '../lib/content';
 
 const FEATURE_ICONS = [Compass, Users, Zap];
 
-// Headline types itself out quickly; caret hides when done.
-// Text is static for the component's lifetime — no reset path needed.
+// Headline types itself out; caret hides when done.
 function TypeText({ text, speed = 45, className }: { text: string; speed?: number; className?: string }) {
   const [shown, setShown] = useState(0);
   useEffect(() => {

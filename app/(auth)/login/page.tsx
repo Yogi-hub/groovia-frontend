@@ -48,6 +48,11 @@ function LoginForm() {
             That email is already registered. Sign in below to continue.
           </div>
         )}
+        {reason === 'idle' && (
+          <div className="mb-5 px-3 py-2.5 rounded-lg bg-accent-50 border border-accent-200 text-xs text-accent-700">
+            You were signed out due to inactivity. Sign in again to continue.
+          </div>
+        )}
 
         <GoogleButton next={next} />
 

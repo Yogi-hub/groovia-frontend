@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { Clock } from 'lucide-react';
 import { createClient } from '../lib/supabase/client';
 import { UI_CONTENT } from '../lib/content';
+import { LS_KEYS } from '../lib/chatStorage';
 import { cn } from '../lib/utils';
 
 interface Thread {
@@ -65,8 +66,7 @@ export function HistoryList({ open }: Props) {
     }
   }, [open]);
 
-  // Initial load + refresh whenever someone dispatches 'groovia:history-refresh'.
-  // ChatInterface fires this event after a successful thread claim.
+  // Initial load + refresh on 'groovia:history-refresh' (fired after thread claim).
   /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     fetchThreads();
@@ -89,10 +89,10 @@ export function HistoryList({ open }: Props) {
         ? data.messages
         : [{ role: 'assistant', content: UI_CONTENT.welcomeMessage }];
 
-      window.localStorage.setItem('groovia.threadId', JSON.stringify(threadId));
-      window.localStorage.setItem('groovia.messages', JSON.stringify(messages));
-      window.localStorage.setItem('groovia.resumeUploaded', JSON.stringify(messages.length > 1));
-      window.localStorage.setItem('groovia.intentSelected', JSON.stringify(messages.length > 2));
+      window.localStorage.setItem(LS_KEYS.threadId, JSON.stringify(threadId));
+      window.localStorage.setItem(LS_KEYS.messages, JSON.stringify(messages));
+      window.localStorage.setItem(LS_KEYS.resumeUploaded, JSON.stringify(messages.length > 1));
+      window.localStorage.setItem(LS_KEYS.intentSelected, JSON.stringify(messages.length > 2));
 
       router.push(`/chat?t=${threadId}`);
     } catch {

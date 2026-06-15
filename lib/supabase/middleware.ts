@@ -1,5 +1,4 @@
 // Supabase session refresh helper — runs on every request via middleware.ts.
-// Keeps the auth cookie fresh and exposes the user to downstream code.
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 

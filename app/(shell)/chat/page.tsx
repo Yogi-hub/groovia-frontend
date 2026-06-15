@@ -3,7 +3,6 @@ import { createClient } from '../../../lib/supabase/server';
 
 export const metadata = { title: 'Chat — Immigroov' };
 
-// `?t=...` from the sidebar's "New chat" button forces a remount with a fresh thread_id.
 export default async function ChatPage({
   searchParams,
 }: {

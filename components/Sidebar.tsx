@@ -6,22 +6,11 @@ import Image from 'next/image';
 import { HistoryList } from './HistoryList';
 import { UI_CONTENT } from '../lib/content';
 import { FEATURES } from '../lib/features';
+import { clearLocalChat } from '../lib/chatStorage';
 import { cn } from '../lib/utils';
 
 interface Props {
   authed: boolean;
-}
-
-const LS_CHAT_KEYS = [
-  'groovia.threadId',
-  'groovia.messages',
-  'groovia.resumeUploaded',
-  'groovia.intentSelected',
-];
-
-function clearLocalChat() {
-  if (typeof window === 'undefined') return;
-  for (const k of LS_CHAT_KEYS) window.localStorage.removeItem(k);
 }
 
 export function Sidebar({ authed }: Props) {
@@ -49,8 +38,6 @@ export function Sidebar({ authed }: Props) {
     <aside
       className={cn(
         'hidden md:flex w-64 shrink-0 flex-col h-screen sticky top-0',
-        // Deep gradient + subtle ambient glow at the bottom-right corner. Reads as modern,
-        // not flat-dark.
         'bg-[radial-gradient(120%_60%_at_0%_0%,rgba(245,158,11,0.10),transparent_55%),linear-gradient(180deg,#0F2C6B_0%,#0B1E4D_60%,#081637_100%)]',
         'text-white',
       )}
@@ -63,9 +50,6 @@ export function Sidebar({ authed }: Props) {
             width={280}
             height={60}
             priority
-            // Invert the PNG to white so the navy wordmark + orange infinity become a
-            // crisp white silhouette on the dark sidebar. Brand orange comes back at
-            // the rest of the app's surfaces.
             className="object-contain brightness-0 invert"
             style={{ height: '28px', width: 'auto' }}
           />

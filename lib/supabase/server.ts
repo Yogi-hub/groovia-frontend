@@ -1,5 +1,4 @@
-// Server-side Supabase client. Use in Server Components, Server Actions, Route Handlers.
-// Reads/writes session cookies through Next.js's cookies() API.
+// Server-side Supabase client for Server Components, Server Actions, Route Handlers.
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 

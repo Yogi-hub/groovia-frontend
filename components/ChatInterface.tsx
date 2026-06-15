@@ -9,6 +9,7 @@ import { Paperclip, Send, Sparkles, Lock } from 'lucide-react';
 import { UI_CONTENT, INTENT_OPTIONS } from '../lib/content';
 import { createClient } from '../lib/supabase/client';
 import { FEATURES } from '../lib/features';
+import { LS_KEYS, clearLocalChat } from '../lib/chatStorage';
 import { cn } from '../lib/utils';
 import { ChatIntro } from './ChatIntro';
 
@@ -38,18 +39,7 @@ async function authHeaders(): Promise<Record<string, string>> {
   return session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {};
 }
 
-// localStorage keys — kept in one place so newChat() can clear them all.
-const LS_KEYS = {
-  threadId: 'groovia.threadId',
-  messages: 'groovia.messages',
-  resumeUploaded: 'groovia.resumeUploaded',
-  intentSelected: 'groovia.intentSelected',
-} as const;
-
-// localStorage caps at 5 MB per origin in most browsers. A long mentor-list response
-// can be ~10 KB, so 50 messages = comfortably under 1 MB and still gives long
-// scroll-back. Older messages are dropped from the cache only — the backend keeps
-// the full LangGraph state, and HistoryList's "load thread" re-fetches everything.
+// Cap cached messages well under the localStorage quota; backend keeps full history.
 const MAX_MESSAGES_PERSISTED = 50;
 
 function loadFromStorage<T>(key: string, fallback: T): T {
@@ -72,7 +62,7 @@ function safeSetMessages(messages: ChatMessage[]): void {
   try {
     window.localStorage.setItem(LS_KEYS.messages, JSON.stringify(trimmed));
   } catch {
-    // Quota exceeded — drop and continue. Backend retains the full conversation.
+    // Quota exceeded — drop and continue.
   }
 }
 
@@ -80,18 +70,14 @@ export default function ChatInterface({ authed }: Props) {
   const router = useRouter();
   const pathname = usePathname();
 
-  // Guests become "gated" after resume upload — input is disabled, modal pops up
-  // (rendered globally by AuthGateRenderer via the ?signup=required URL param).
-  // Authed users are never gated.
+  // Guests become "gated" after resume upload — input disables, AuthGateRenderer shows the modal.
   const gated = !authed;
 
   function openGate() {
     router.push(`${pathname}?signup=required`);
   }
 
-  // SSR-safe initial state: defaults match what the server renders.
-  // We hydrate from localStorage in a single useEffect AFTER mount to avoid
-  // SSR/CSR hydration mismatches (server has no localStorage).
+  // SSR-safe defaults; hydrated from localStorage in a single effect after mount.
   const [threadId, setThreadId] = useState<string>('');
   const [messages, setMessages] = useState<ChatMessage[]>([
     { role: 'assistant', content: UI_CONTENT.welcomeMessage },
@@ -102,15 +88,8 @@ export default function ChatInterface({ authed }: Props) {
   const [intentSelected, setIntentSelected] = useState(false);
   const [hydrated, setHydrated] = useState(false);
 
-  // One-time client hydration from localStorage.
-  //
-  // sessionStorage trick: it clears when the tab/browser closes; localStorage doesn't.
-  //   - If sessionStorage has NO "sessionStarted" flag → this is a fresh tab.
-  //   - If the user is also unauthenticated AND has stale "resume uploaded" state in
-  //     localStorage, we treat it as a brand-new visit and reset. That prevents the
-  //     "Resume uploaded + locked" page from greeting a guest who never actually did
-  //     anything in *this* session.
-  //   - Authenticated users always keep their data (cookies persisted too).
+  // One-time client hydration from localStorage. A fresh tab (no sessionStorage flag)
+  // with a stale "resume uploaded" guest state is treated as a new visit and reset.
   /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     const isFreshSession = !window.sessionStorage.getItem('groovia.sessionStarted');
@@ -120,7 +99,7 @@ export default function ChatInterface({ authed }: Props) {
 
     if (isFreshSession && !authed && storedResumeUploaded) {
       // Guest reopened the browser — clear stale gated state and start fresh.
-      for (const k of Object.values(LS_KEYS)) window.localStorage.removeItem(k);
+      clearLocalChat();
       const fresh = uuidv4();
       window.localStorage.setItem(LS_KEYS.threadId, JSON.stringify(fresh));
       setThreadId(fresh);
@@ -144,7 +123,6 @@ export default function ChatInterface({ authed }: Props) {
   }, [authed]);
   /* eslint-enable react-hooks/set-state-in-effect */
 
-  // localStorage with the initial defaults.
   useEffect(() => {
     if (!hydrated) return;
     safeSetMessages(messages);
@@ -159,7 +137,6 @@ export default function ChatInterface({ authed }: Props) {
   }, [intentSelected, hydrated]);
 
   // When a guest signs in, link the guest thread to their account so it appears in history.
-  // Idempotent on the backend. Dispatches an event so the sidebar re-fetches its list.
   useEffect(() => {
     if (!hydrated || !authed || !threadId) return;
     (async () => {
@@ -176,10 +153,7 @@ export default function ChatInterface({ authed }: Props) {
     })();
   }, [hydrated, authed, threadId]);
 
-  // Auto-resume the user's most recent thread on sign-in.
-  // Triggers only when (1) the feature flag is on, (2) the user is authed, (3) the local
-  // chat is empty (just the welcome message + no resume uploaded), so we never clobber
-  // an in-progress conversation. Premium-tier gating can later wrap this in a paid check.
+  // Auto-resume the user's most recent thread on sign-in, only if the local chat is empty.
   useEffect(() => {
     if (!hydrated || !authed || !FEATURES.chatPersist) return;
     if (resumeUploaded || messages.length > 1) return;
@@ -202,7 +176,6 @@ export default function ChatInterface({ authed }: Props) {
 
       setThreadId(last.id);
       setMessages(restored);
-      // Their prior conversation already covered the upload + intent gates.
       setResumeUploaded(true);
       setIntentSelected(true);
       window.localStorage.setItem(LS_KEYS.threadId, JSON.stringify(last.id));
@@ -215,8 +188,7 @@ export default function ChatInterface({ authed }: Props) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
-    // While the entry hero is showing, stay at the top — auto-scrolling would
-    // jump straight past it to the composer.
+    // Stay at the top while the entry hero is showing.
     if (!resumeUploaded && messages.length <= 1) return;
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, loading, resumeUploaded]);
@@ -302,7 +274,7 @@ export default function ChatInterface({ authed }: Props) {
   }
 
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex flex-col h-full">
       <input
         type="file"
         ref={fileInputRef}
@@ -312,10 +284,8 @@ export default function ChatInterface({ authed }: Props) {
         disabled={resumeUploaded}
       />
 
-      {/* Intro + Messages */}
       <div className="flex-1 overflow-y-auto">
-        {/* Full-height hero — only shown when the conversation hasn't really started.
-            The CTA scrolls down into the chat area below. */}
+        {/* Hero shown only before the conversation starts. */}
         {!resumeUploaded && messages.length <= 1 && (
           <ChatIntro onStart={() => chatStartRef.current?.scrollIntoView({ behavior: 'smooth' })} />
         )}
@@ -347,8 +317,7 @@ export default function ChatInterface({ authed }: Props) {
           ))}
 
           {loading && (
-            /* Centered thinking indicator — no bubble/backdrop. mix-blend-multiply
-               drops the GIF's white background onto the light page. */
+            // Centered thinking indicator; mix-blend-multiply drops the GIF's white background.
             <div className="fixed inset-0 z-40 flex items-center justify-center pointer-events-none bg-background/10 backdrop-blur-sm">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
@@ -381,10 +350,8 @@ export default function ChatInterface({ authed }: Props) {
         </div>
       </div>
 
-      {/* Composer */}
       <div className="bg-background/95 backdrop-blur-md">
         <div className="mx-auto max-w-3xl px-4 py-4">
-          {/* Show a "locked" callout when a guest has uploaded their resume — input is disabled. */}
           {gated && resumeUploaded && (
             <button
               onClick={openGate}

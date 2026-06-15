@@ -4,18 +4,7 @@ import Link from 'next/link';
 import { LogOut, LogIn, User as UserIcon } from 'lucide-react';
 import { Button } from './ui/Button';
 import { createClient } from '../lib/supabase/client';
-
-const LS_CHAT_KEYS = [
-  'groovia.threadId',
-  'groovia.messages',
-  'groovia.resumeUploaded',
-  'groovia.intentSelected',
-];
-
-function clearLocalChat() {
-  if (typeof window === 'undefined') return;
-  for (const k of LS_CHAT_KEYS) window.localStorage.removeItem(k);
-}
+import { clearLocalChat } from '../lib/chatStorage';
 
 export function TopBarClient({ email }: { email: string | null }) {
   const [signingOut, setSigningOut] = useState(false);
@@ -25,14 +14,12 @@ export function TopBarClient({ email }: { email: string | null }) {
     const supabase = createClient();
     await supabase.auth.signOut();
     clearLocalChat();
-    // Hard navigate so the server-rendered shell sees the new (signed-out) state immediately.
+    // Hard navigate so the server-rendered shell sees the signed-out state.
     window.location.href = '/chat';
   }
 
+  // Transparent wrapper — pointer-events re-enabled on the chip itself.
   return (
-    // Sticky but FULLY TRANSPARENT — content scrolls behind the chip area unobstructed.
-    // pointer-events-none on the wrapper lets clicks fall through to the page; the chip
-    // re-enables pointer-events for itself.
     <div className="sticky top-0 z-30 pointer-events-none">
       <div className="flex items-center justify-end gap-3 px-4 sm:px-6 py-3">
         {email ? (

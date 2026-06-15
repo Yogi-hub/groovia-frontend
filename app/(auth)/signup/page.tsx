@@ -7,6 +7,7 @@ import { Card, CardBody } from '../../../components/ui/Card';
 import { Input } from '../../../components/ui/Input';
 import { Button } from '../../../components/ui/Button';
 import { GoogleButton } from '../../../components/GoogleButton';
+import { getRecaptchaToken } from '../../../lib/recaptcha';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -25,6 +26,26 @@ export default function SignupPage() {
     }
     setError(null);
     setLoading(true);
+
+    // Fail open if the reCAPTCHA script can't load (e.g. blocked by an ad-blocker).
+    const recaptchaToken = await getRecaptchaToken('signup').catch(() => null);
+    if (recaptchaToken) {
+      try {
+        const r = await fetch('/api/auth/verify-recaptcha', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token: recaptchaToken }),
+        });
+        const { success } = await r.json();
+        if (!success) {
+          setLoading(false);
+          setError('Verification failed. Please try again.');
+          return;
+        }
+      } catch {
+        // Fail open — don't block signup if verification is unreachable.
+      }
+    }
 
     // Backend check first — works around Supabase's email-enumeration protection
     // so duplicates get routed cleanly to /login instead of silently failing.

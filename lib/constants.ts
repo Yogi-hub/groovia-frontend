@@ -1,5 +1,4 @@
-// Shared, non-content constants. URL bases live here so they can be swapped
-// in one place (e.g. when Cal.com is replaced by Stripe Connect in Slice 3).
+// Shared, non-content constants — URL bases live here so they can be swapped in one place.
 
 export const CAL_BASE_URL = 'https://cal.com';
 

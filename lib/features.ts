@@ -1,6 +1,4 @@
-// Frontend feature flags. Mirror of the backend's config.FEATURE_* values.
-// Each flag reads NEXT_PUBLIC_FEATURE_<NAME> at build time. Default ON.
-// Set NEXT_PUBLIC_FEATURE_<NAME>=false in Vercel env to turn off.
+// Mirror of the backend's config.FEATURE_* values; reads NEXT_PUBLIC_FEATURE_<NAME> at build time.
 
 function flag(name: string, defaultOn = true): boolean {
   const raw = process.env[`NEXT_PUBLIC_FEATURE_${name}`];
@@ -19,4 +17,8 @@ export const FEATURES = {
   // UI-only flags (no backend equivalent needed)
   cookieConsent:         flag('COOKIE_CONSENT', false),  // not implemented yet — off
   analytics:             flag('ANALYTICS',      false),  // not implemented yet — off
+  idleLogout:            flag('IDLE_LOGOUT',    false),  // auto sign-out after inactivity; off by default
 } as const;
+
+// Minutes of inactivity before idleLogout signs the user out.
+export const IDLE_TIMEOUT_MINUTES = Number(process.env.NEXT_PUBLIC_IDLE_TIMEOUT_MINUTES) || 30;
