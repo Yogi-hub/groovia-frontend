@@ -1,6 +1,6 @@
 'use client';
 import { Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { SignupModal } from './SignupModal';
 
 interface Props {
@@ -9,9 +9,20 @@ interface Props {
 
 function GateInner({ authed }: Props) {
   const params = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
   // Only guests can be gated. URL param `?signup=required` triggers the modal.
   const gated = !authed && params.get('signup') === 'required';
-  return <SignupModal open={gated} />;
+
+  function handleClose() {
+    // Strip the param so the next gated click changes the URL and reopens the modal.
+    const next = new URLSearchParams(params);
+    next.delete('signup');
+    const qs = next.toString();
+    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+  }
+
+  return <SignupModal open={gated} onClose={handleClose} />;
 }
 
 export function AuthGateRenderer(props: Props) {

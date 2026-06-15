@@ -3,7 +3,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
-import { MessageSquarePlus, Users, UserCircle, MessagesSquare, ChevronDown, Globe2 } from 'lucide-react';
+import { MessageSquarePlus, Users, UserCircle, MessagesSquare, ChevronDown, Globe2, CalendarCheck } from 'lucide-react';
 import { UI_CONTENT } from '../lib/content';
 import { clearLocalChat } from '../lib/chatStorage';
 import { cn } from '../lib/utils';
@@ -31,6 +31,7 @@ export function MobileNav({ authed }: Props) {
     { href: '/chat',    label: UI_CONTENT.sidebar.chat,    icon: MessagesSquare, gated: false },
     { href: '/mentors', label: UI_CONTENT.sidebar.mentors, icon: Users,          gated: true  },
     { href: '/account', label: UI_CONTENT.sidebar.account, icon: UserCircle,     gated: true  },
+    { href: '/mentor',  label: UI_CONTENT.sidebar.mentorPortal, icon: CalendarCheck, gated: true },
   ];
 
   return (

@@ -36,8 +36,8 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // /account is still auth-only.
-  if (!user && path.startsWith('/account')) {
+  // /account and /mentor are auth-only.
+  if (!user && (path.startsWith('/account') || path.startsWith('/mentor'))) {
     const url = request.nextUrl.clone();
     url.pathname = '/login';
     url.searchParams.set('next', path);

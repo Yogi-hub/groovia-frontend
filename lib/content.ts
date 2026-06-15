@@ -34,6 +34,7 @@ export const UI_CONTENT = {
     chat: 'Chat',
     mentors: 'Mentors',
     account: 'Account',
+    mentorPortal: 'Join as Mentor',
     history: 'Recent chats',
     historyEmpty: 'No previous chats yet.',
     signIn: 'Sign in',
@@ -46,6 +47,7 @@ export const UI_CONTENT = {
     createAccount: 'Create free account',
     haveAccount: 'I already have an account',
     requireAccount: 'We need an account before continuing.',
+    noCreditCard: 'No credit card needed',
   },
 } as const;
 

@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { MessageSquarePlus, Users, UserCircle, MessagesSquare } from 'lucide-react';
+import { MessageSquarePlus, Users, UserCircle, MessagesSquare, CalendarCheck } from 'lucide-react';
 import Image from 'next/image';
 import { HistoryList } from './HistoryList';
 import { UI_CONTENT } from '../lib/content';
@@ -32,6 +32,7 @@ export function Sidebar({ authed }: Props) {
     { href: '/chat',    label: UI_CONTENT.sidebar.chat,    icon: MessagesSquare, gated: false },
     { href: '/mentors', label: UI_CONTENT.sidebar.mentors, icon: Users,          gated: true  },
     { href: '/account', label: UI_CONTENT.sidebar.account, icon: UserCircle,     gated: true  },
+    { href: '/mentor',  label: UI_CONTENT.sidebar.mentorPortal, icon: CalendarCheck, gated: true },
   ];
 
   return (

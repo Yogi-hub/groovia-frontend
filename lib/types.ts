@@ -13,6 +13,13 @@ export interface Mentor {
   professional_domains: string[];
   years_lived_experience: number | null;
   booking_url: string | null;
+  nylas_grant_id?: string | null;
+  session_duration_minutes?: number;
+}
+
+export interface AvailabilitySlot {
+  start_time: number;
+  end_time: number;
 }
 
 export interface ChatMessage {

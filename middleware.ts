@@ -13,6 +13,7 @@ export const config = {
     '/',
     '/chat',
     '/account/:path*',
+    '/mentor/:path*',
     '/login',
     '/signup',
     '/verify-email',
