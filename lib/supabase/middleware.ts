@@ -36,8 +36,8 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // /account and /mentor are auth-only.
-  if (!user && (path.startsWith('/account') || path.startsWith('/mentor'))) {
+  // /account is auth-only. /mentor is public — guests see the "Join as Mentor" signup form.
+  if (!user && path.startsWith('/account')) {
     const url = request.nextUrl.clone();
     url.pathname = '/login';
     url.searchParams.set('next', path);

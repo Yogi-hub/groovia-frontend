@@ -2,6 +2,7 @@ import { createClient } from '../../../lib/supabase/server';
 import { backendBaseUrl } from '../../../lib/backend';
 import { ConnectCalendar } from '../../../components/ConnectCalendar';
 import { MentorSignupForm } from '../../../components/MentorSignupForm';
+import { MentorAccountSignupForm } from '../../../components/MentorAccountSignupForm';
 
 export const metadata = { title: 'Join as Mentor — Immigroov' };
 
@@ -33,7 +34,9 @@ export default async function MentorPage() {
       <p className="text-sm text-muted mt-1">Connect your calendar so candidates can book sessions with you.</p>
 
       <div className="mt-8">
-        {mentor ? (
+        {!session ? (
+          <MentorAccountSignupForm />
+        ) : mentor ? (
           <ConnectCalendar
             mentorName={mentor.display_name}
             nylasEmail={mentor.nylas_email}
