@@ -64,6 +64,11 @@ export function SignupModal({ open, onClose }: Props) {
           <CreditCard className="h-3 w-3" />
           {t.noCreditCard}
         </p>
+
+        <p className="mt-4 text-center text-xs text-muted">
+          Want to become a mentor instead?{' '}
+          <Link href="/mentor" className="text-brand-700 hover:underline">Join as a mentor</Link>
+        </p>
       </div>
     </div>
   );

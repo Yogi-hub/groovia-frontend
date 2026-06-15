@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { MessageSquarePlus, Users, UserCircle, MessagesSquare, CalendarCheck } from 'lucide-react';
+import { MessageSquarePlus, Users, UserCircle, MessagesSquare, CalendarCheck, ShieldCheck } from 'lucide-react';
 import Image from 'next/image';
 import { HistoryList } from './HistoryList';
 import { UI_CONTENT } from '../lib/content';
@@ -11,9 +11,10 @@ import { cn } from '../lib/utils';
 
 interface Props {
   authed: boolean;
+  role?: string | null;
 }
 
-export function Sidebar({ authed }: Props) {
+export function Sidebar({ authed, role }: Props) {
   const pathname = usePathname();
   const router = useRouter();
 
@@ -22,10 +23,10 @@ export function Sidebar({ authed }: Props) {
     router.push(`/chat?t=${Date.now()}`);
   }
 
-  // For guests, gated links open the auth modal at the current URL via ?signup=required.
+  // For guests, gated links go to /signup with a next= redirect param.
   function hrefFor(realHref: string, gated: boolean): string {
     if (!gated || authed) return realHref;
-    return `${pathname}?signup=required`;
+    return `/signup?next=${encodeURIComponent(realHref)}`;
   }
 
   const nav = [
@@ -33,6 +34,7 @@ export function Sidebar({ authed }: Props) {
     { href: '/mentors', label: UI_CONTENT.sidebar.mentors, icon: Users,          gated: true  },
     { href: '/account', label: UI_CONTENT.sidebar.account, icon: UserCircle,     gated: true  },
     { href: '/mentor',  label: UI_CONTENT.sidebar.mentorPortal, icon: CalendarCheck, gated: false },
+    ...(role === 'admin' ? [{ href: '/admin', label: UI_CONTENT.sidebar.admin, icon: ShieldCheck, gated: false }] : []),
   ];
 
   return (

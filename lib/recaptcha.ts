@@ -28,6 +28,8 @@ function loadScript(): Promise<void> {
 
 export async function getRecaptchaToken(action: string): Promise<string | null> {
   if (!SITE_KEY) return null;
+  // reCAPTCHA site keys are domain-locked; skip on localhost to avoid console errors.
+  if (typeof window !== 'undefined' && window.location.hostname === 'localhost') return null;
   await loadScript();
   return new Promise((resolve) => {
     window.grecaptcha!.ready(async () => {

@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Card, CardBody } from './ui/Card';
 import { Button } from './ui/Button';
 import { Input } from './ui/Input';
@@ -10,6 +11,7 @@ export function MentorSignupForm() {
   const router = useRouter();
   const [displayName, setDisplayName] = useState('');
   const [headline, setHeadline] = useState('');
+  const [agreedMentor, setAgreedMentor] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -23,7 +25,7 @@ export function MentorSignupForm() {
   }, []);
 
   async function submit() {
-    if (!displayName.trim()) return;
+    if (!displayName.trim() || !agreedMentor) return;
     setSubmitting(true);
     setError(null);
     try {
@@ -43,6 +45,7 @@ export function MentorSignupForm() {
           display_name: displayName.trim(),
           headline: headline.trim() || undefined,
           timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+          agreed_to_mentor_terms: agreedMentor,
         }),
       });
       const data = await res.json();
@@ -79,9 +82,22 @@ export function MentorSignupForm() {
           onChange={(e) => setHeadline(e.target.value)}
           placeholder="e.g. Software engineer who moved from India to the Netherlands"
         />
+        <label className="text-xs text-muted flex items-start gap-2 select-none">
+          <input
+            type="checkbox"
+            className="mt-0.5 accent-[--color-brand-500]"
+            checked={agreedMentor}
+            onChange={(e) => setAgreedMentor(e.target.checked)}
+          />
+          <span>
+            I agree to the Mentor Terms, Data Processing Agreement, and commission structure, and
+            consent to anonymised session insights being used to improve Groovia. (See{' '}
+            <Link href="/mentor-terms" className="underline hover:text-foreground">Mentor Agreement</Link>.)
+          </span>
+        </label>
         {error && <p className="text-sm text-red-600">{error}</p>}
         <div>
-          <Button variant="accent" onClick={submit} loading={submitting} disabled={!displayName.trim()}>
+          <Button variant="accent" onClick={submit} loading={submitting} disabled={!displayName.trim() || !agreedMentor}>
             Create mentor profile
           </Button>
         </div>

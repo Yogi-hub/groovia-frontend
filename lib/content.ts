@@ -35,10 +35,18 @@ export const UI_CONTENT = {
     mentors: 'Mentors',
     account: 'Account',
     mentorPortal: 'Join as Mentor',
+    admin: 'Admin',
     history: 'Recent chats',
     historyEmpty: 'No previous chats yet.',
     signIn: 'Sign in',
     signOut: 'Sign out',
+  },
+  admin: {
+    title: 'Mentor Applications',
+    subtitle: 'Review and approve mentors who have applied to join Immigroov.',
+    empty: 'No pending applications.',
+    approve: 'Approve',
+    reject: 'Reject',
   },
   signupModal: {
     title: 'Save your progress to continue',
