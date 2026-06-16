@@ -4,7 +4,7 @@ import { createClient } from '../../../lib/supabase/server';
 import { backendBaseUrl } from '../../../lib/backend';
 import { ConnectCalendar } from '../../../components/ConnectCalendar';
 import { Card, CardBody } from '../../../components/ui/Card';
-import { MentorAuthTrigger } from '../../../components/MentorAuthTrigger';
+import { MentorLanding } from '../../../components/MentorLanding';
 
 export const metadata = { title: 'Mentor Hub — Immigroov' };
 
@@ -25,11 +25,11 @@ export default async function MentorPage() {
   if (!session) {
     return (
       <div className="mx-auto max-w-3xl px-4 sm:px-6 py-10">
-        <h1 className="text-3xl font-semibold tracking-tight text-brand-900">Become a mentor</h1>
-        <p className="text-sm text-muted mt-1">Help immigrants navigate their career journey.</p>
-        <div className="mt-8">
-          <MentorAuthTrigger />
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold tracking-tight text-brand-900">Become a mentor</h1>
+          <p className="text-base text-muted mt-2">Help immigrants navigate their career journey.</p>
         </div>
+        <MentorLanding />
       </div>
     );
   }
