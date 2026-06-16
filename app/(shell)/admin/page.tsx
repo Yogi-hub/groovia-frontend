@@ -15,6 +15,7 @@ export interface PendingMentor {
   created_at: string;
   email: string | null;
   full_name: string | null;
+  submission_count: number;
 }
 
 export default async function AdminPage() {

@@ -55,6 +55,9 @@ export function AdminMentorList({ initialMentors }: Props) {
                 <div className="flex items-center gap-2 flex-wrap">
                   <h2 className="text-base font-semibold text-foreground">{mentor.display_name}</h2>
                   <Badge tone="neutral">{mentor.status.replace('_', ' ')}</Badge>
+                  {mentor.submission_count > 1 && (
+                    <Badge tone="warning">Re-submission #{mentor.submission_count}</Badge>
+                  )}
                 </div>
                 {mentor.headline && (
                   <p className="text-sm text-muted mt-0.5">{mentor.headline}</p>

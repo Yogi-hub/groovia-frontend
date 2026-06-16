@@ -195,7 +195,7 @@ function AuthModalInner() {
                       role === r ? 'bg-white text-brand-900 shadow-sm' : 'text-muted hover:text-foreground',
                     )}
                   >
-                    {r === 'candidate' ? 'User' : 'Become a Mentor'}
+                    {r === 'candidate' ? 'User' : 'Mentor'}
                   </button>
                 ))}
               </div>
