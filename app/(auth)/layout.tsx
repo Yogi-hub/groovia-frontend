@@ -1,11 +1,19 @@
 import Link from 'next/link';
+import { X } from 'lucide-react';
 import { Logo } from '../../components/ui/Logo';
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen flex flex-col hero-gradient">
       <main className="flex-1 flex items-center justify-center px-4 py-8">
-        <div className="w-full max-w-md animate-fade-up">
+        <div className="relative w-full max-w-md animate-fade-up">
+          <Link
+            href="/chat"
+            aria-label="Close"
+            className="absolute -top-2 -right-2 p-1.5 rounded-full text-muted hover:text-foreground hover:bg-black/5 transition-colors"
+          >
+            <X className="h-4 w-4" />
+          </Link>
           <div className="flex justify-center mb-6">
             <Logo />
           </div>

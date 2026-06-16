@@ -2,7 +2,7 @@ import { createClient } from '../../lib/supabase/server';
 import { Sidebar } from '../../components/Sidebar';
 import { MobileNav } from '../../components/MobileNav';
 import { TopBar } from '../../components/TopBar';
-import { AuthGateRenderer } from '../../components/AuthGateRenderer';
+import { AuthModal } from '../../components/AuthModal';
 import { PageTransition } from '../../components/PageTransition';
 import { IdleLogout } from '../../components/IdleLogout';
 
@@ -30,7 +30,7 @@ export default async function ShellLayout({ children }: { children: React.ReactN
           <PageTransition>{children}</PageTransition>
         </main>
       </div>
-      <AuthGateRenderer authed={!!user} />
+      <AuthModal />
       <IdleLogout authed={!!user} />
     </div>
   );

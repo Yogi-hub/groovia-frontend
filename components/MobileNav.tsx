@@ -24,7 +24,7 @@ export function MobileNav({ authed }: Props) {
 
   function hrefFor(realHref: string, gated: boolean): string {
     if (!gated || authed) return realHref;
-    return `${pathname}?signup=required`;
+    return `${pathname}?auth=open&next=${encodeURIComponent(realHref)}`;
   }
 
   const nav = [

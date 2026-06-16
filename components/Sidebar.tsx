@@ -23,10 +23,10 @@ export function Sidebar({ authed, role }: Props) {
     router.push(`/chat?t=${Date.now()}`);
   }
 
-  // For guests, gated links go to /signup with a next= redirect param.
+  // For guests, gated links open the auth modal over the current page.
   function hrefFor(realHref: string, gated: boolean): string {
     if (!gated || authed) return realHref;
-    return `/signup?next=${encodeURIComponent(realHref)}`;
+    return `${pathname}?auth=open&next=${encodeURIComponent(realHref)}`;
   }
 
   const nav = [

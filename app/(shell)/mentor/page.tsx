@@ -1,10 +1,9 @@
-import { Suspense } from 'react';
 import { createClient } from '../../../lib/supabase/server';
 import { backendBaseUrl } from '../../../lib/backend';
 import { ConnectCalendar } from '../../../components/ConnectCalendar';
 import { MentorSignupForm } from '../../../components/MentorSignupForm';
-import { AuthForm } from '../../../components/AuthForm';
 import { Card, CardBody } from '../../../components/ui/Card';
+import { MentorAuthTrigger } from '../../../components/MentorAuthTrigger';
 
 export const metadata = { title: 'Join as Mentor — Immigroov' };
 
@@ -38,9 +37,7 @@ export default async function MentorPage() {
 
       <div className="mt-8 flex flex-col gap-4">
         {!session ? (
-          <Suspense fallback={null}>
-            <AuthForm defaultRole="mentor" />
-          </Suspense>
+          <MentorAuthTrigger />
         ) : !mentor ? (
           <MentorSignupForm />
         ) : (
