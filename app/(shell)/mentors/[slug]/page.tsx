@@ -2,11 +2,9 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Card, CardBody } from '../../../../components/ui/Card';
 import { Badge } from '../../../../components/ui/Badge';
-import { Button } from '../../../../components/ui/Button';
 import { BookingWidget } from '../../../../components/BookingWidget';
 import type { Mentor } from '../../../../lib/types';
 import { backendBaseUrl } from '../../../../lib/backend';
-import { calBookingUrl } from '../../../../lib/constants';
 
 async function fetchMentor(slug: string): Promise<Mentor | null> {
   try {
@@ -81,21 +79,14 @@ export default async function MentorProfilePage({
         </Card>
       )}
 
-      {mentor.booking_url && (
-        <Card className="bg-brand-50 border-brand-200">
-          <CardBody className="pt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <h2 className="text-base font-semibold text-brand-900">Book a 1-on-1 session</h2>
-              <p className="text-sm text-brand-900/70 mt-1">
-                Direct time with {mentor.display_name.split(' ')[0]}.
-              </p>
-            </div>
-            <a href={calBookingUrl(mentor.booking_url) ?? '#'} target="_blank" rel="noopener noreferrer">
-              <Button variant="accent">Open booking page</Button>
-            </a>
-          </CardBody>
-        </Card>
-      )}
+      <Card className="border-dashed">
+        <CardBody className="pt-6">
+          <h2 className="text-base font-semibold text-foreground">Book a 1-on-1 session</h2>
+          <p className="text-sm text-muted mt-1">
+            {mentor.display_name.split(' ')[0]} is setting up their calendar. Check back soon to book a session.
+          </p>
+        </CardBody>
+      </Card>
     </div>
   );
 }

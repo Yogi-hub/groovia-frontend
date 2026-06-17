@@ -121,6 +121,19 @@ export default async function MentorPage() {
 
         {mentor.status === 'approved' && (
           <>
+            {!mentor.nylas_email && (
+              <Card className="border-accent-300 bg-accent-50/40">
+                <CardBody className="pt-6">
+                  <h2 className="text-base font-semibold text-foreground">
+                    Next step: connect your calendar
+                  </h2>
+                  <p className="text-sm text-muted mt-1">
+                    You&apos;re approved! Before mentees can book sessions with you, connect your
+                    Google or Outlook calendar below so your real availability is shown.
+                  </p>
+                </CardBody>
+              </Card>
+            )}
             <ConnectCalendar
               mentorName={mentor.display_name}
               nylasEmail={mentor.nylas_email}
@@ -130,7 +143,9 @@ export default async function MentorPage() {
               <CardBody className="pt-6">
                 <h2 className="text-base font-semibold text-foreground">Your profile is live</h2>
                 <p className="text-sm text-muted mt-1">
-                  Mentees can discover and book sessions with you.{' '}
+                  {mentor.nylas_email
+                    ? 'Mentees can discover and book sessions with you. '
+                    : 'Your profile is visible to mentees, but booking is disabled until your calendar is connected. '}
                   <Link href={`/mentors/${mentor.slug}`} className="text-brand-700 hover:underline">
                     View public profile →
                   </Link>
