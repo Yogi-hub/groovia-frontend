@@ -13,8 +13,9 @@ export interface Mentor {
   professional_domains: string[];
   years_lived_experience: number | null;
   booking_url: string | null;
-  nylas_grant_id?: string | null;
   session_duration_minutes?: number;
+  /** True when the mentor has a live Nylas calendar connection. Never contains the grant_id itself. */
+  has_calendar?: boolean;
 }
 
 export interface AvailabilitySlot {

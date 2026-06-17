@@ -48,6 +48,28 @@ export const UI_CONTENT = {
     approve: 'Approve',
     reject: 'Reject',
   },
+  booking: {
+    videoCall: 'Video call',
+    confirmedTitle: 'Session confirmed!',
+    confirmedBody: (mentorName: string, email: string) =>
+      `Your session with ${mentorName} is confirmed. A confirmation email has been sent to ${email}.`,
+    joinVideoCall: 'Join video call',
+    addToCalendar: 'Add to Google Calendar',
+    noSlotsTitle: (firstName: string) => `${firstName} has no open slots in the next two weeks.`,
+    noSlotsBody: 'Please check back later.',
+    loadingSlots: 'Loading available times…',
+    form: {
+      namePlaceholder: 'Jane Doe',
+      emailPlaceholder: 'jane@example.com',
+      notesLabel: 'Additional notes',
+      notesPlaceholder: 'Please share anything that will help prepare for our meeting.',
+      termsPrefix: "By proceeding, you agree to Immigroov's",
+      terms: 'Terms',
+      privacy: 'Privacy Policy',
+      back: 'Back',
+      confirm: 'Confirm',
+    },
+  },
   signupModal: {
     title: 'Save your progress to continue',
     subtitle:
