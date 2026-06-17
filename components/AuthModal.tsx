@@ -11,7 +11,7 @@ import { getRecaptchaToken } from '../lib/recaptcha';
 import { cn } from '../lib/utils';
 
 type Role = 'candidate' | 'mentor';
-type Mode = 'signup' | 'login';
+type Mode = 'signup' | 'login' | 'forgot';
 
 function AuthModalInner() {
   const router = useRouter();
@@ -32,11 +32,12 @@ function AuthModalInner() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [agreedTerms, setAgreedTerms] = useState(false);
   const [agreedMentor, setAgreedMentor] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [forgotSent, setForgotSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [pendingVerification, setPendingVerification] = useState(false);
 
-  // Reset form state each time the modal opens.
   useEffect(() => {
     if (isOpen) {
       setRole(paramRole);
@@ -48,6 +49,8 @@ function AuthModalInner() {
       setConfirmPassword('');
       setAgreedTerms(false);
       setAgreedMentor(false);
+      setForgotEmail('');
+      setForgotSent(false);
       setError(null);
       setPendingVerification(false);
     }
@@ -67,6 +70,8 @@ function AuthModalInner() {
   function switchMode(m: Mode) {
     setMode(m);
     setError(null);
+    setForgotSent(false);
+    if (m === 'forgot') setForgotEmail(email);
   }
 
   const isMentor = role === 'mentor';
@@ -139,6 +144,19 @@ function AuthModalInner() {
     window.location.href = isMentor ? '/mentor' : (next ?? '/chat');
   }
 
+  async function handleForgotPassword(e: React.FormEvent) {
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
+    const supabase = createClient();
+    const { error: resetError } = await supabase.auth.resetPasswordForEmail(forgotEmail, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    setLoading(false);
+    if (resetError) { setError(resetError.message); return; }
+    setForgotSent(true);
+  }
+
   if (!isOpen) return null;
 
   const googleNext = isMentor ? '/mentor' : next;
@@ -169,6 +187,45 @@ function AuthModalInner() {
               <button onClick={() => switchMode('login')} className="mt-4 text-sm text-brand-700 hover:underline">
                 Sign in instead
               </button>
+            </div>
+          ) : mode === 'forgot' ? (
+            <div className="flex flex-col gap-4">
+              <div className="text-center">
+                <h2 className="text-2xl font-semibold tracking-tight text-brand-900">Forgot password?</h2>
+                <p className="text-sm text-muted mt-1">We&apos;ll email you a reset link.</p>
+              </div>
+              {forgotSent ? (
+                <div className="flex flex-col gap-4 text-center">
+                  <p className="text-sm text-muted">
+                    If <span className="font-medium text-foreground">{forgotEmail}</span> matches an account,
+                    a reset link is on its way. Check your spam folder if it doesn&apos;t arrive within a
+                    few minutes.
+                  </p>
+                  <Button variant="outline" onClick={() => switchMode('login')}>
+                    Back to sign in
+                  </Button>
+                </div>
+              ) : (
+                <form onSubmit={handleForgotPassword} className="flex flex-col gap-3">
+                  <Input
+                    label="Email"
+                    type="email"
+                    required
+                    value={forgotEmail}
+                    onChange={(e) => setForgotEmail(e.target.value)}
+                    autoComplete="email"
+                  />
+                  {error && <p className="text-xs text-red-600">{error}</p>}
+                  <Button type="submit" loading={loading}>Send reset link</Button>
+                  <button
+                    type="button"
+                    onClick={() => switchMode('login')}
+                    className="text-xs text-muted text-center hover:text-foreground"
+                  >
+                    ← Back to sign in
+                  </button>
+                </form>
+              )}
             </div>
           ) : (
             <>
@@ -281,9 +338,13 @@ function AuthModalInner() {
                     onChange={(e) => setPassword(e.target.value)} autoComplete="current-password" />
                   {error && <p className="text-xs text-red-600">{error}</p>}
                   <Button type="submit" loading={loading}>Sign in</Button>
-                  <Link href="/forgot-password" className="text-xs text-muted text-center hover:text-foreground">
+                  <button
+                    type="button"
+                    onClick={() => switchMode('forgot')}
+                    className="text-xs text-muted text-center hover:text-foreground"
+                  >
                     Forgot password?
-                  </Link>
+                  </button>
                 </form>
               )}
             </>

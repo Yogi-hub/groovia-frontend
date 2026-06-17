@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
 import { LogOut, LogIn, User as UserIcon } from 'lucide-react';
 import { Button } from './ui/Button';
 import { createClient } from '../lib/supabase/client';
@@ -8,17 +8,21 @@ import { clearLocalChat } from '../lib/chatStorage';
 
 export function TopBarClient({ email }: { email: string | null }) {
   const [signingOut, setSigningOut] = useState(false);
+  const pathname = usePathname();
+  const router = useRouter();
 
   async function handleSignOut() {
     setSigningOut(true);
     const supabase = createClient();
     await supabase.auth.signOut();
     clearLocalChat();
-    // Hard navigate so the server-rendered shell sees the signed-out state.
     window.location.href = '/chat';
   }
 
-  // Transparent wrapper — pointer-events re-enabled on the chip itself.
+  function openSignIn() {
+    router.push(`${pathname}?auth=open&mode=login`);
+  }
+
   return (
     <div className="sticky top-0 z-30 pointer-events-none">
       <div className="flex items-center justify-end gap-3 px-4 sm:px-6 py-3">
@@ -40,19 +44,25 @@ export function TopBarClient({ email }: { email: string | null }) {
               <LogOut className="h-4 w-4" />
               <span className="hidden sm:inline">Sign out</span>
             </Button>
-            <Link href="/account" className="sm:hidden">
-              <Button variant="ghost" size="sm" aria-label="Account" className="bg-card/90 backdrop-blur-md">
-                <UserIcon className="h-4 w-4" />
-              </Button>
-            </Link>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="sm:hidden bg-card/90 backdrop-blur-md"
+              aria-label="Account"
+              onClick={() => router.push('/account')}
+            >
+              <UserIcon className="h-4 w-4" />
+            </Button>
           </div>
         ) : (
-          <Link href="/login" className="pointer-events-auto">
-            <Button size="sm" className="shadow-[0_4px_18px_-6px_rgba(15,42,107,0.4)]">
-              <LogIn className="h-4 w-4" />
-              Sign in
-            </Button>
-          </Link>
+          <Button
+            size="sm"
+            className="pointer-events-auto shadow-[0_4px_18px_-6px_rgba(15,42,107,0.4)]"
+            onClick={openSignIn}
+          >
+            <LogIn className="h-4 w-4" />
+            Sign in
+          </Button>
         )}
       </div>
     </div>

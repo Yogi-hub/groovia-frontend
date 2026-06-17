@@ -22,7 +22,7 @@ export default function LandingPage() {
               Discover countries that fit your story, prep your CV, and book real conversations.
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-              <Link href="/signup">
+              <Link href="/?auth=open">
                 <Button size="lg">Start with Groovia</Button>
               </Link>
               <Link href="/mentors">
